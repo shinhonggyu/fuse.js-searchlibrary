@@ -1,17 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
 import "./App.css";
 import characters from "./characters.json";
 import Fuse from "fuse.js";
 
-const fuse = new Fuse(characters, {
-  keys: ["name", "company", "species"],
-  includeScore: true,
-});
-
-const results = fuse.search("bender");
-const characterResults = results.map((character) => character.item);
-
 function App() {
+  const [query, updateQuery] = useState("");
+
+  const fuse = new Fuse(characters, {
+    keys: ["name", "company", "species"],
+    threshold: 0.6,
+    includeScore: true,
+  });
+
+  const results = fuse.search(query);
+  const characterResults = query
+    ? results.map((character) => character.item)
+    : characters;
+
+  const onSearch = ({ currentTarget }) => {
+    updateQuery(currentTarget.value);
+  };
+  console.log({ characterResults });
   return (
     <>
       <header className="App-header">
@@ -50,7 +59,7 @@ function App() {
         <aside>
           <form className="search">
             <label>Search</label>
-            <input type="text" />
+            <input type="text" value={query} onChange={onSearch} />
           </form>
         </aside>
       </main>
